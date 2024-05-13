@@ -1,6 +1,8 @@
 package database
 
-import "errors"
+import (
+	"errors"
+)
 
 var (
 	ErrCantFindProduct    = errors.New("can't find product")
