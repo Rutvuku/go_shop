@@ -10,19 +10,35 @@ import (
 	"github.com/Rutvuku/go_restro/database"
 	"github.com/Rutvuku/go_restro/models"
 	"github.com/gin-gonic/gin"
+	"github.com/go-playground/validator/v10"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
+	"golang.org/x/crypto/bcrypt"
 )
 
 var UserCollection *mongo.Collection = database.UserData(database.Client, "Users")
+var ProductCollection *mongo.Collection = database.ProductData(database.Client, "Products")
+var Validate = validator.New()
 
 func HashPassword(password string) string {
+	bytes, err := bcrypt.GenerateFromPassword([]byte(password), 14)
+	if err != nil {
+		log.Panic("error occured")
+	}
+	return string(bytes)
 
 }
 
 func VerifyPassword(userPassword string, givenPassword string) (bool, string) {
-
+	valid := true
+	msg := ""
+	err := bcrypt.CompareHashAndPassword([]byte(givenPassword), []byte(userPassword))
+	if err != nil {
+		msg = "password is incorrect"
+		valid = false
+	}
+	return valid, msg
 }
 
 func SignUp() gin.HandlerFunc {
@@ -124,7 +140,28 @@ func ProductViewerAdmin() gin.HandlerFunc {
 }
 
 func SearchProduct() gin.HandlerFunc {
-
+	return func(c *gin.Context) {
+		var productList []models.Product
+		var ctx, cancel = context.WithTimeout(context.Background(), 100*time.Second)
+		defer cancel()
+		cursor, err := ProductCollection.Find(ctx, bson.D{{}})
+		if err != nil {
+			c.AbortWithStatus(http.StatusInternalServerError)
+			return
+		}
+		err = cursor.All(ctx, &productList)
+		if err != nil {
+			c.AbortWithStatus(http.StatusInternalServerError)
+			return
+		}
+		defer cursor.Close(ctx)
+		if err := cursor.Err(); err != nil {
+			log.Println(err)
+			c.IndentedJSON(400, "invalid")
+		}
+		defer cancel()
+		c.IndentedJSON(200, productList)
+	}
 }
 
 func SearchProductByQuery() gin.HandlerFunc {
