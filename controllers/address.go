@@ -33,6 +33,7 @@ func AddAddress() gin.HandlerFunc {
 			return
 		}
 		var ctx, cancel = context.WithTimeout(context.Background(), 100*time.Second)
+		defer cancel()
 		match_filter := bson.D{{Key: "$match", Value: bson.D{primitive.E{Key: "_id", Value: address}}}}
 		unwind := bson.D{{Key: "$unwind", Value: bson.D{primitive.E{Key: "path", Value: "$address"}}}}
 		grouping := bson.D{{Key: "group", Value: bson.D{primitive.E{Key: "_id", Value: "$address_id"}, {Key: "count", Value: bson.D{primitive.E{Key: "$sum", Value: 1}}}}}}
