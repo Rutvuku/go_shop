@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"context"
+	"log"
 	"net/http"
 	"time"
 
@@ -55,6 +56,10 @@ func AddAddress() gin.HandlerFunc {
 			filter := bson.D{primitive.E{Key: "_id", Value: address}}
 			update := bson.D{{Key: "$ push", Value: bson.D{primitive.E{Key: "address", Value: addresses}}}}
 			_, err = UserCollection.UpdateOne(ctx, filter, update)
+			if err != nil {
+				println(err)
+
+			}
 		} else {
 			c.IndentedJSON(400, "Not allowed")
 		}
@@ -65,7 +70,40 @@ func AddAddress() gin.HandlerFunc {
 }
 
 func EditHomeAddress() gin.HandlerFunc {
-
+	return func(c *gin.Context) {
+		user_id := c.Query("id")
+		if user_id == "" {
+			c.Header("Content-Type", "application/json")
+			c.IndentedJSON(http.StatusBadRequest, gin.H{"Error": "invalid search id"})
+			c.Abort()
+			return
+		}
+		usert_id, err := primitive.ObjectIDFromHex(user_id)
+		if err != nil {
+			log.Println(err)
+			c.IndentedJSON(http.StatusInternalServerError, "internal server error")
+			c.Abort()
+			return
+		}
+		var editaddress models.Address
+		if err := c.BindJSON(&editaddress); err != nil {
+			c.IndentedJSON(http.StatusBadRequest, err.Error())
+		}
+		var ctx, cancel = context.WithTimeout(context.Background(), 100*time.Second)
+		defer cancel()
+		filter := bson.D{primitive.E{Key: "_id", Value: usert_id}}
+		update := bson.D{{Key: "$set", Value: bson.D{primitive.E{Key: "address.0.house_name", Value: editaddress.House}, {Key: "address.0.street_name", Value: editaddress.Street}, {Key: "address.0.city_name", Value: editaddress.City}, {Key: "address.0.pin_code", Value: editaddress.Pincode}}}}
+		_, err = UserCollection.UpdateOne(ctx, filter, update)
+		if err != nil {
+			log.Println(err)
+			c.IndentedJSON(http.StatusInternalServerError, "internal server error")
+			c.Abort()
+			return
+		}
+		defer cancel()
+		ctx.Done()
+		c.IndentedJSON(200, "Successfully Updated the Home address")
+	}
 }
 
 func EditWorkAddress() gin.HandlerFunc {
