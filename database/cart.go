@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"log"
+	"time"
 
 	"github.com/Rutvuku/go_restro/models"
 	"go.mongodb.org/mongo-driver/bson"
@@ -64,7 +65,27 @@ func RemoveCartItem(ctx context.Context, prodCollection *mongo.Collection, userC
 
 }
 
-func BuyItemFromCart() {
+func BuyItemFromCart(ctx context.Context, userCollection *mongo.Collection, userID string) error {
+	id, err := primitive.ObjectIDFromHex(userID)
+	if err != nil {
+		//panic(err)
+		return ErrUserIDIsNotValid
+	}
+	var getCartItems models.User
+	var orderCart models.Order
+
+	orderCart.Order_ID = primitive.NewObjectID()
+	orderCart.Order_Cart = make([]models.ProductUser, 0)
+	orderCart.Orderered_At = time.Now()
+	orderCart.Payment_Method.COD = true
+
+	unwind := bson.D{{Key: "$unwind", Value: bson.D{primitive.E{Key: "path", Value: "$usercart"}}}}
+	grouping := bson.D{{Key: "$group", Value: bson.D{primitive.E{Key: "_id", Value: "$_id"}, {Key: "total", Value: bson.D{primitive.E{Key: "$sum", Value: "$usercart.price"}}}}}}
+	currentresults, err := userCollection.Aggregate(ctx, mongo.Pipeline{unwind, grouping})
+	if err != nil {
+		panic(err)
+	}
+	ctx.Done()
 
 }
 
