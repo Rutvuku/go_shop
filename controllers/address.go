@@ -17,7 +17,7 @@ func AddAddress() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		user_id := c.Query("id")
 		if user_id == "" {
-			c.Header("Content-Type,application/json")
+			c.Header("Content-Type", "application/json")
 			c.IndentedJSON(http.StatusBadRequest, gin.H{"Error": "invalid search id"})
 			c.Abort()
 			return
@@ -147,7 +147,7 @@ func DeleteAddress() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var user_id = c.Query("id")
 		if user_id == "" {
-			c.Header("Content-Type,application/json")
+			c.Header("Content-Type", "application/json")
 			c.IndentedJSON(http.StatusBadRequest, gin.H{"Error": "invalid search id"})
 			c.Abort()
 			return

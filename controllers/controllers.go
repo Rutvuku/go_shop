@@ -9,6 +9,7 @@ import (
 
 	"github.com/Rutvuku/go_restro/database"
 	"github.com/Rutvuku/go_restro/models"
+	generate "github.com/Rutvuku/go_restro/tokens"
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
 	"go.mongodb.org/mongo-driver/bson"
