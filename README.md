@@ -1,7 +1,4 @@
-##**Ecommerce With Golang Project By Akhil Sharma**
-**Code-Along video series on Youtube**
 
-```bash
 # You can start the project with below commands
 docker-compose up -d
 go run main.go
@@ -29,8 +26,8 @@ Response :"Successfully Signed Up!!"
 
 ```json
 {
-  "email": "akhil@gmail.com",
-  "password": "akhilsharma"
+  "email": "rutvik@gmail.com",
+  "password": "rutututu"
 }
 ```
 
@@ -39,10 +36,10 @@ response will be like this
 ```json
 {
   "_id": "***********************",
-  "first_name": "akhil",
-  "last_name": "sharma",
+  "first_name": "Rutvik",
+  "last_name": "Aakarsh",
   "password": "$2a$14$UIYjkTfnFnhg4qhIfhtYnuK9qsBQifPKgu/WPZAYBaaN17j0eTQZa",
-  "email": "akhil@gmail.com",
+  "email": "rutvik@gmail.com",
   "phone": "+4534545435",
   "token": "eyJc0Bwcm90b25vbWFpbC5jb20iLCJGaXJzdF9OYW1lIjoiam9zZXBoIiwiTGFzdF9OYW1lIjoiaGVybWlzIiwiVWlkIjoiNjE2MTRmNTM5ZjI5YmU5NDJiZDlkZjhlIiwiZXhwIjoxNjMzODUzNjUxfQ.NbcpVtPLJJqRF44OLwoanynoejsjdJb5_v2qB41SmB8",
   "Refresh_Token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJFbWFpbCI6IiIsIkZpcnLCJVaWQiOiIiLCJleHAiOjE2MzQzNzIwNTF9.ocpU8-0gCJsejmCeeEiL8DXhFcZsW7Z3OCN34HgIf2c",
