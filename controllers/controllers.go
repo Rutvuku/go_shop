@@ -86,7 +86,7 @@ func SignUp() gin.HandlerFunc {
 		user.Order_Status = make([]models.Order, 0)
 		user.Address_Details = make([]models.Address, 0)
 
-		token, refreshtoken := generate.TokenGenerator(*user.Email, *user.First_Name, *user.Last_Name, user.User_ID)
+		token, refreshtoken, _ := generate.TokenGenerator(*user.Email, *user.First_Name, *user.Last_Name, user.User_ID)
 
 		user.Token = &token
 		user.Refresh_Token = &refreshtoken
@@ -137,7 +137,22 @@ func Login() gin.HandlerFunc {
 }
 
 func ProductViewerAdmin() gin.HandlerFunc {
-
+	return func(c *gin.Context) {
+		var ctx, cancel = context.WithTimeout(context.Background(), 100*time.Second)
+		defer cancel()
+		var product models.Product
+		if err := c.BindJSON(&product); err != nil {
+			c.IndentedJSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+			return
+		}
+		_, anyerr := ProductCollection.InsertOne(ctx, product)
+		if anyerr != nil {
+			c.IndentedJSON(http.StatusInternalServerError, gin.H{"error": "not inserted"})
+			return
+		}
+		defer cancel()
+		c.JSON(http.StatusOK, "successfully added")
+	}
 }
 
 func SearchProduct() gin.HandlerFunc {
